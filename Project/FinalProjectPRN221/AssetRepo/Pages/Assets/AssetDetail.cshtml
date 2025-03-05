@@ -1,0 +1,388 @@
+﻿@page "/Assets/AssetDetail/{aid}/{folderId:long?}"
+@model AssetRepo.Pages.Assets.AssetDetailModel
+@{
+    ViewData["Title"] = Model.AssetDetail.AssetName;
+    int aid = TempData["AssetId"] != null ? (int)TempData["AssetId"] : 0;
+    long? folderId = TempData["FolderId"] != null ? (long?)TempData["FolderId"] : 0;
+    string a = TempData["Test"] != null ? (string)TempData["Test"] : "";
+}
+
+@section Styles {
+    <style>
+        .table > :not(caption) > * > * {
+            border-bottom-width: 0px;
+            .add-folder-button
+        }
+
+        .fab-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+
+        .fab-main {
+            width: 60px;
+            height: 60px;
+            background-color: #fbaf5b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+            overflow: hidden;
+        }
+
+        /* Hover to expand */
+        .fab-container:hover .fab-main {
+            width: 200px;
+            padding-right: 10px;
+            border-radius: 30px;
+        }
+
+        /* Hidden buttons */
+        .fab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-left: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        /* Show buttons on hover */
+        .fab-container:hover .fab-buttons {
+            opacity: 1;
+        }
+
+        /* Individual button styles */
+        .fab-button {
+            background-color: white;
+            color: #4285F4;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .fab-button:hover {
+                background-color: #a2a2a2;
+            }
+
+        .plus-icon {
+            position: absolute;
+            font-size: 24px;
+            color: white;
+            transition: opacity 0.3s;
+        }
+
+        /* Hide the plus icon on hover */
+        .fab-container:hover .plus-icon {
+            opacity: 0;
+        }
+
+        /* Ensure .fab-buttons appear on hover */
+        .fab-container:hover .fab-buttons {
+            opacity: 1;
+            margin-left: 10px;
+        }
+
+
+        .fab-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+            .fab-icon .line {
+                position: absolute;
+                border-radius: 2px;
+            }
+
+            /* Vertical line */
+            .fab-icon .line-vertical {
+                width: 6px;
+                height: 24px;
+                background-color: #34a853; /* Green */
+                left: 9px;
+            }
+
+            /* Horizontal line */
+            .fab-icon .line-horizontal {
+                width: 24px;
+                height: 6px;
+                background-color: #ea4335; /* Red */
+                top: 9px;
+            }
+
+            /* Color blocks */
+            .fab-icon .top-left {
+                position: absolute;
+                width: 6px;
+                height: 6px;
+                background-color: #f4ff00; /* Yellow */
+                top: 0;
+                left: 0;
+            }
+
+            .fab-icon .bottom-right {
+                position: absolute;
+                width: 6px;
+                height: 6px;
+                background-color: #4285f4; /* Blue */
+                bottom: 0;
+                right: 0;
+            }
+
+        .link {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+            .link:hover {
+                color: #2980b9;
+                text-decoration: underline;
+                text-decoration-color: #2980b9;
+            }
+
+        .linkk {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .rename, .deletee {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+            /* Tạo hiệu ứng khi hover vào biểu tượng */
+            .rename:hover {
+                transform: scale(1.2);
+                color: aqua
+            }
+
+        .delete:hover {
+            transform: scale(1.2);
+            color: red
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: -100%;
+            width: 20%;
+            padding: 15px;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: right 0.5s ease;
+        }
+
+            .notification.show {
+                right: 20px;
+            }
+
+
+            .notification.success {
+                background-color: #28a745;
+            }
+
+
+            .notification.error {
+                background-color: #dc3545;
+            }
+    </style>
+}
+<h1>@a</h1>
+@if (TempData["Message"] != null)
+{
+    <div id="notification" class="notification @TempData["MessageType"]">
+        @TempData["Message"]
+    </div>
+}
+
+
+
+<!-- Breadcrumb Navigation -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a class="link" href="/Assets/AssetRepository">
+                AssetRepo
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a class="link" href="/Assets/AssetDetail/@Model.AssetDetail.AssetId">
+                @Model.AssetDetail.AssetName
+            </a>
+        </li>
+        @if (Model.AssetDetail?.CurrentFolder != null)
+        {
+            var folderss = await Model.GetFolderPath(Model.AssetDetail.CurrentFolder.FolderId);
+            @foreach (var folder in folderss)
+            {
+                bool isLastItem = folder == folderss.Last();
+
+                <li class="breadcrumb-item @(isLastItem ? "active" : "")" @(isLastItem ? "aria-current='page'" : "")>
+                    @if (!isLastItem)
+                    {
+                        <a class="link" href="/Assets/AssetDetail/@Model.AssetDetail.AssetId/@folder.FolderId">
+                            @folder.FolderName
+                        </a>
+                    }
+                    else
+                    {
+                        @folder.FolderName
+                    }
+                </li>
+            }
+        }
+    </ol>
+</nav>
+
+<div>
+    <table class="table table-hover" style="width: 100%; vertical-align: middle;">
+        <thead>
+            <tr>
+
+                <th style="width: 42%;">Name</th>
+                <th style="width: 25%;">Date modified</th>
+                <th style="width: 25%;">Type</th>
+                <th style="width: 8%; text-align:center"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.AssetDetail?.SubFolders != null && Model.AssetDetail?.SubFolders.Count() > 0)
+            {
+                @foreach (var folder in Model.AssetDetail.SubFolders)
+                {
+                    <tr>
+                        <td>
+                            <a class="linkk" href="/Assets/AssetDetail/@Model.AssetDetail.AssetId/@folder.FolderId">
+                                <i class="bi bi-folder-fill" style="color:#ffbd3a"></i> @folder.FolderName
+                            </a>
+                        </td>
+                        <td>@folder.CreatedDate?.ToString("dd/MM/yyyy")</td>
+                        <td>File Folder</td>
+                        <td style="text-align:center">
+                            <a href="/Assets/HandleRename/CheckType/@folder.FolderId/0/@folder.AssetId/@("Folder")">
+                                <i class="bi bi-gear-wide text-info rename" style="font-size:25px"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            @if (Model.AssetDetail?.Files != null && Model.AssetDetail.Files.Count() > 0)
+            {
+                @foreach (var file in Model.AssetDetail.Files)
+                {
+                    <tr>
+                        <td>
+                            <a class="linkk" href="/Assets/DisplayFile/@file.FileId/Display" target="_blank">
+
+                            <i class="bi bi-file-earmark-text-fill" style="color: #8f8f8f"></i> @file.FileName
+                            </a>
+                        </td>
+                        <td>@file.CreatedDate?.ToString("dd/MM/yyyy")</td>
+                        <td>@file.TypeFile</td>
+                        <td style="text-align:center">
+                            @if(file.FolderId == null)
+                            {
+                                <a href="/Assets/HandleRename/CheckType/0/@file.FileId/@file.AssetId/@("File")">
+                                    <i class="bi bi-gear-wide text-info rename" style="font-size:25px"></i>
+                                </a>
+                            } else
+                            {
+                                <a href="/Assets/HandleRename/CheckType/@file.FolderId/@file.FileId/@file.AssetId/@("File")">
+                                    <i class="bi bi-gear-wide text-info rename" style="font-size:25px"></i>
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Handle File/Folder -->
+
+<div class="fab-container">
+    <!-- Main FAB with plus icon -->
+    <div class="fab-main">
+        <div class="fab-icon plus-icon">
+            <div class="line line-vertical"></div>
+            <div class="line line-horizontal"></div>
+            <div class="top-left"></div>
+            <div class="bottom-right"></div>
+        </div>
+        <div class="fab-buttons">
+            <!-- Add Folder Button -->
+            <div class="fab-button" style="color:burlywood" onclick="addFolder()" title="Add New Folder">
+                <i class="bi bi-cloud-plus-fill"></i>
+            </div>
+            <!-- Upload File Button -->
+            <div class="fab-button" style="color:#07a671" onclick="uploadFile()" title="Upload File">
+                <i class="bi bi-cloud-arrow-up-fill"></i>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function addFolder() {
+    var aid = @aid; // Lấy giá trị aid từ Razor
+    var folderId = @folderId; // Lấy giá trị folderId từ Razor
+
+    if (folderId === null || folderId === 0) {
+        // Nếu folderId là null hoặc bằng 0, chỉ sử dụng aid
+        window.location.href = "/Assets/Upload/" + aid + "/0/NewFolder";
+    } else {
+        // Nếu có folderId, sử dụng cả aid và folderId
+                window.location.href = "/Assets/Upload/" + aid + "/" + folderId + "/NewFolder";
+    }
+}
+
+        function uploadFile() {
+            var aid = @aid; 
+            var folderId = @folderId; 
+
+            if (folderId === null || folderId === 0) {
+                // Nếu folderId là null hoặc bằng 0, chỉ sử dụng aid
+                window.location.href = "/Assets/Upload/" + aid + "/0/UploadFile";
+            } else {
+                // Nếu có folderId, sử dụng cả aid và folderId
+                window.location.href = "/Assets/Upload/" + aid + "/" + folderId + "/UploadFile";
+            }
+        }
+
+
+
+                window.onload = function () {
+                    var notification = document.getElementById('notification');
+                    if (notification) {
+                        // Show notification
+                        notification.classList.add('show');
+
+                        // After 3 second, hidden notification
+                        setTimeout(function () {
+                            notification.classList.remove('show');
+                        }, 3000);
+                    }
+                };
+    </script>
+
+}

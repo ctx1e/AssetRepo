@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssetRepo", "AssetRepo\AssetRepo.csproj", "{C2857008-745A-4D16-A564-29AF083AA09E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C2857008-745A-4D16-A564-29AF083AA09E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2857008-745A-4D16-A564-29AF083AA09E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2857008-745A-4D16-A564-29AF083AA09E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2857008-745A-4D16-A564-29AF083AA09E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {16C702C1-C7B7-4A84-A84F-7EA5EFFAD6FC}
+	EndGlobalSection
+EndGlobal

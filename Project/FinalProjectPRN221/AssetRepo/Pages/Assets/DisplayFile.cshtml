@@ -1,0 +1,16 @@
+﻿@page "/Assets/DisplayFile/{fid}/{type}"
+@model AssetRepo.Pages.Assets.DisplayFileModel
+@{
+    ViewData["Title"] = Model.fileById.FileName;
+}
+
+<h2>File Content</h2>
+
+@if (!string.IsNullOrEmpty(Model.FileContent))
+{
+    <pre>@Model.FileContent</pre>
+}
+else
+{
+    <p>File content is empty or file could not be found.</p>
+}

@@ -1,0 +1,100 @@
+﻿html {
+  font-size: 14px;
+
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 120%;
+}
+
+body {
+    /*margin-bottom: 60px;*/
+}
+
+.no-assets-container {
+    border: 2px dashed #ffaa00;
+    border-radius: 10px;
+    background-color: #fef8e7;
+    animation: fadeIn 1s ease-in-out;
+}
+
+
+.icon-wrapper {
+    font-size: 50px;
+    color: #ffaa00;
+    animation: bounce 1.5s infinite;
+}
+
+.no-assets-text {
+    color: #212529;
+    font-weight: bold;
+   
+    animation: fadeInDown 0.8s ease-in-out;
+}
+
+.no-assets-subtext {
+    color: #6c757d;
+  
+    font-size: 14px;
+    animation: fadeInUp 0.8s ease-in-out;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-10px);
+    }
+
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+textarea {
+            max-height: 100px;
+        
+}

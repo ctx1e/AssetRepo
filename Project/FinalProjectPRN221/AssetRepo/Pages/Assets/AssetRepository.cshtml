@@ -1,0 +1,199 @@
+﻿@page "/Assets/AssetRepository/{handler?}/{PageNumber:int?}/{searchTerm?}"
+@model AssetRepo.Pages.Assets.AssetRepositoryModel
+
+@{
+    ViewData["Title"] = "Asset Repository";
+}
+
+<!-- Style Asset Repository Page-->
+@section Styles {
+    <style>
+        .link {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+            .link:hover {
+                color: #2980b9;
+                text-decoration: underline;
+                text-decoration-color: #2980b9;
+            }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: -100%;
+            width: 20%;
+            padding: 15px;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: right 0.5s ease;
+        }
+
+            .notification.show {
+                right: 20px;
+            }
+
+
+            .notification.success {
+                background-color: #28a745;
+            }
+
+
+            .notification.error {
+                background-color: #dc3545;
+            }
+    </style>
+}
+
+@section Scripts {
+    <script>
+
+        let currentAssetId = null;
+
+        document.querySelectorAll('[data-bs-toggle="modal"]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var assetName = button.getAttribute('data-asset-name');
+                currentAssetId = button.getAttribute('data-asset-id'); 
+                document.getElementById('assetName').textContent = assetName;
+            });
+        });
+
+        document.getElementById("confirmDelete").addEventListener("click", function () {
+            if (currentAssetId) {
+                window.location.href = "/Assets/HandleAsset/Delete/" + currentAssetId; 
+            }
+        });
+
+
+        window.onload = function () {
+            var notification = document.getElementById('notification');
+            if (notification) {
+                // Show notification
+                notification.classList.add('show');
+
+                // After 3 second, hidden notification
+                setTimeout(function () {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        };
+
+
+        function searchAssets() {
+            const searchTerm = document.getElementById("searchInput").value;
+            const pageNumber = 1; // Thiết lập trang khởi đầu
+            window.location.href = `/Assets/AssetRepository/Search/${pageNumber}/${encodeURIComponent(searchTerm)}`;
+        }
+
+    </script>
+}
+
+@if (TempData["Message"] != null)
+{
+    <div id="notification" class="notification @TempData["MessageType"]">
+        @TempData["Message"]
+    </div>
+}
+
+<!-- Content Asset Repository-->
+<section>
+
+    <div class="container mt-5" style="max-width: 80%; margin: auto;">
+        <div class="text-center">
+            <h1 class="fw-bold">Asset Repository</h1>
+        </div>
+
+        <div class="my-4 d-flex justify-content-center">
+            <h4 style="color:#ffaa00"><i class="bi bi-folder-fill"></i> Asset Availaible <@Model.TotalAssets> </h4>
+        </div>
+
+        <div class="my-3 d-flex justify-content-between">
+            <a class="btn btn-outline-success mx-2" href="/Assets/HandleAsset">
+                <i class="bi bi-folder-plus fw-bold"></i> <span class="fw-bold">Add Asset</span>
+            </a>
+
+            <!-- Search bar with icon -->
+            <div class="input-group" style="max-width: 300px;">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search assets..." value="@Model.SearchTerm">
+                <button type="button" class="btn btn-outline-secondary" onclick="searchAssets()">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </div>
+
+        @if (Model.Assets != null && Model.Assets.Any())
+        {
+            <div class="card" >
+                <div class="card-body">
+
+                    <table class="table table-hover" style="width: 100%; vertical-align: middle;">
+                        <thead>
+                            <tr>
+                                <th style="width: 2%;"><i class="bi bi-card-list"></i></th>
+                                <th style="width: 20%;">Name</th>
+                                <th style="width: 30%;">Description</th>
+                                <th style="width: 5%;">Project</th>
+                                <th style="width: 20%;">Created Date</th>
+                                <th style="width: 10%; text-align:center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (Asset asset in Model.Assets)
+                            {
+                                <tr>
+                                    <th scope="row"><i class="bi bi-folder-fill" style="color:#ffbd3a"></i></th>
+                                    <td>
+                                        <a class="link" href="/Assets/AssetDetail/@asset.AssetId" >
+                                            @asset.AssetName
+                                        </a>
+                                    </td>
+                                    <td>@asset.Description</td>
+                                    <td class="text-center">@asset.Projects.Count()</td>
+                                    
+                                    <td><i class="bi bi-clock-history"></i> @asset.CreatedDate?.ToString("dd/MM/yyyy")</td>
+
+
+
+                                    <td style="display:flex; justify-content:space-around">
+                                        <a href="/Assets/HandleAsset/Update/@asset.AssetId" class="btn btn-outline-info"><i class="bi bi-folder-check"></i></a>
+                                        <a href="#" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                           data-asset-name="@asset.AssetName" data-asset-id="@asset.AssetId"><i class="bi bi-folder-x"></i></a>
+                                    </td>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog text-center">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    Do you want to delete product <span id="assetName">@asset.AssetName</span>?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                                                    <button type="button" class="btn btn-danger" id="confirmDelete">Yes</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <partial name="/Pages/Shared/Pagination/_PaginationPartial.cshtml" model="Model.Pagination" />
+        } else
+        {
+            <div class="alert alert-warning text-center">No assets available <i class="bi bi-emoji-frown-fill text-warning"></i></div>
+        }
+    </div>
+
+
+</section>

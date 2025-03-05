@@ -1,0 +1,52 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+@section Styles {
+    <style>
+        #autoCarousel {
+            width: 100%;
+            overflow: hidden;
+            margin: 0 auto; 
+        }
+
+            /* Set fixed size for each image */
+          
+        .fixed-size {
+            width: 100%;
+            height: 600px; /* Set a fixed height */
+            object-fit: cover; /* Maintain aspect ratio and cover the area */
+        }
+        .carousel-container {
+            display: flex;
+            align-items: center;
+            height: 95vh; 
+
+        }
+    </style>
+}
+@section Scripts {
+    <script>
+        const totalImages = 8; 
+        const imgElement = document.getElementById("randomSlide");
+
+        function setRandomImage() {
+            const randomIndex = Math.floor(Math.random() * totalImages) + 1;
+            imgElement.src = `/ImageCommon/background${randomIndex}.jpg`;
+        }
+
+        setInterval(setRandomImage, 2000); 
+    </script>
+}
+
+<div class="carousel-container">
+    <div id="autoCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img id="randomSlide" class="fixed-size" src="/ImageCommon/background1.jpg" alt="Random Slide">
+            </div>
+        </div>
+    </div>
+</div>

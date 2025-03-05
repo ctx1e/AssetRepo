@@ -1,0 +1,143 @@
+﻿@page "/Assets/Upload/{aid}/{folderId?}/{type}"
+@model AssetRepo.Pages.Assets.UploadModel
+@{
+    ViewData["Title"] = Model.typeName;
+    int aid = TempData["AssetId"] != null ? (int)TempData["AssetId"] : 0;
+    long? folderId = TempData["FolderId"] != null ? (long?)TempData["FolderId"] : 0;
+
+}
+
+@section Styles {
+    <style>
+        .HandleAsset {
+            margin: 0 auto;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: center;
+            background: linear-gradient(145deg, #e0dfdf, #f1f1f1);
+            padding: 20px;
+            border-radius: 8px;
+            width: 50%;
+            margin: 0 auto;
+            box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .custom-textarea {
+            max-height: 100px;
+        }
+
+        h1 {
+            color: #212121
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: -100%;
+            width: 20%;
+            padding: 15px;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: right 0.5s ease;
+        }
+
+            .notification.show {
+                right: 20px;
+            }
+
+
+            .notification.success {
+                background-color: #28a745;
+            }
+
+
+            .notification.error {
+                background-color: #dc3545;
+            }
+    </style>
+}
+
+
+@if (TempData["Message"] != null)
+{
+    <div id="notification" class="notification @TempData["MessageType"]">
+        @TempData["Message"]
+    </div>
+}
+
+
+<div class="form-container">
+    <form method="post" enctype="multipart/form-data">
+            <input asp-for="aid" type="hidden" />
+            <input asp-for="type" type="hidden" />
+            <input asp-for="typeName" type="hidden" />
+            <input asp-for="folderId" type="hidden" />
+        @if (Model.typeName.ToLower().Equals("new folder"))
+        {
+            <div class="mb-3">
+                <label asp-for="folder.FolderName" class="form-label fw-bold">Folder Name</label>
+                <input asp-for="folder.FolderName" class="form-control" />
+                <span asp-validation-for="folder.FolderName" class="text-danger"></span>
+
+            </div>
+            
+            <div style="display:flex; justify-content:center">
+                <button type="submit" class="btn btn-outline-success mx-2">
+                    Add New Folder
+                </button>
+            </div>
+        } else
+        {
+            <div class="mb-3">
+                <label asp-for="file.FileName" class="form-label fw-bold">File Name</label>
+                <input asp-for="file.FileName" id="fileName" class="form-control" />
+                <span asp-validation-for="file.FileName" class="text-danger"></span>
+
+            </div>
+            <div class="mb-3">
+                <label asp-for="UploadedFile" class="form-label fw-bold">Select File</label>
+                <input asp-for="UploadedFile" id="uploadedFile" type="file" class="form-control" />
+                <span asp-validation-for="UploadedFile" class="text-danger"></span>
+
+            </div>
+            <div style="display:flex; justify-content:center">
+                <button type="submit" class="btn btn-outline-success mx-2">
+                    Upload File
+                </button>
+            </div>
+        }
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        window.onload = function () {
+            var notification = document.getElementById('notification');
+            if (notification) {
+                // Show notification
+                notification.classList.add('show');
+
+                // After 3 second, hidden notification
+                setTimeout(function () {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        };
+
+        document.getElementById('uploadedFile').addEventListener('change', function () {
+            const fileNameInput = document.getElementById('fileName');
+            const selectedFile = this.files[0];
+
+            if (selectedFile) {
+                fileNameInput.value = selectedFile.name;
+            } else {
+                fileNameInput.value = ''; // Clear input if no file selected
+            }
+        });
+    </script>
+}

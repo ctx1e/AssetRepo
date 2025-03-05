@@ -1,0 +1,89 @@
+﻿@page "/ProjectsAndSolds/HandleAS/{handler?}/{asid?}"
+@model AssetRepo.Pages.ProjectsAndSolds.HandleASModel
+@{
+    ViewData["Title"] = Model.AssetSold?.AssetSoldId == 0 ? "Add Asset Sold" : "Update Asset Sold";
+
+}
+
+@section Styles {
+    <style>
+        .HandleAsset {
+            margin: 0 auto;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: center;
+            background: linear-gradient(145deg, #e0dfdf, #f1f1f1);
+            padding: 20px;
+            border-radius: 8px;
+            width: 50%;
+            margin: 0 auto;
+            box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+}
+<section>
+    <!-- Header Handle Product-->
+    <div class="my-4">
+        <a href="/ProjectsAndSolds/PAS">
+            <button class="btn btn-outline-warning"><i class="bi bi-caret-left-square-fill"></i> Back to Product & Sold</button>
+        </a>
+        <h1 class="text-center">
+            @if (Model.AssetSold.AssetSoldId == 0)
+            {
+                <text>Add Asset Sold</text>
+            }
+            else
+            {
+                <text>Update Asset Sold</text>
+            }
+        </h1>
+    </div>
+
+    <div class="form-container">
+        <form method="post" style="width:50%">
+            <input type="hidden" asp-for="AssetSold.AssetSoldId" />
+            <div class="mb-3">
+                <label asp-for="AssetSold.AssetId" class="form-label fw-bold">Select Asset</label>
+                <select asp-for="AssetSold.AssetId" class="form-control">
+                    <option value="">-- Select Asset --</option>
+                    @foreach (var asset in Model.AvailableAssets)
+                    {
+                        <option value="@asset.AssetId">@asset.AssetName</option>
+                    }
+                </select>
+                <span asp-validation-for="AssetSold.AssetId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="AssetSold.SalePrice" class="form-label fw-bold">Sale Price</label>
+                <input asp-for="AssetSold.SalePrice" class="form-control" />
+            </div>
+            <div style="display:flex; justify-content:center">
+                @if(Model.AvailableAssets.Count() > 0) {
+                <button type="submit" class="btn btn-outline-success"> 
+                    @if (Model.AssetSold.AssetSoldId == 0)
+                    {
+                        <text><span class="fw-bold">Add Asset Sold</span></text>
+                    }
+                    else
+                    {
+                        <text><span class="fw-bold">Update Asset Sold</span> </text>
+                    }
+                    </button>
+                } else
+                {
+                    <button type="submit" class="btn btn-outline-success" disabled>
+                        Out Of Stock <i class="bi bi-emoji-dizzy-fill" style="color:crimson"></i>
+                    </button>
+                }
+            </div>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+}

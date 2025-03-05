@@ -1,0 +1,58 @@
+﻿@model PaginationHelper
+
+<style>
+    a.page-link {
+        cursor: pointer;
+        pointer-events: auto;
+
+    }
+
+    .page-item.active .page-link {
+        z-index: 3;
+        color: #fff;
+        background-color: #888a8c;
+        border-color: #8f8f8f;
+    }
+</style>
+
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="Page navigation" class="my-3">
+        <ul class="pagination justify-content-center">
+            @if (Model.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Model.GetPageUrl(Model.PreviousPage)">Previous</a>
+                </li>
+
+            }
+            else
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                </li>
+            }
+
+            <!-- Sửa URL để sử dụng giá trị động của i -->
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="@Model.GetPageUrl(i)">@i</a>
+                </li>
+            }
+
+            @if (Model.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Model.GetPageUrl(Model.NextPage)">Next</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                </li>
+            }
+        </ul>
+    </nav>
+}

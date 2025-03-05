@@ -1,0 +1,86 @@
+﻿@page "//ProjectsAndSolds/HandlePL/{handler?}/{pid?}"
+@model AssetRepo.Pages.ProjectsAndSolds.HandlePLModel
+@{
+    ViewData["Title"] = @Model.Project?.ProjectId == 0 ? "Add Project" : "Update Project";
+
+}
+
+
+
+@section Styles {
+    <style>
+        .HandleAsset {
+            margin: 0 auto;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: center;
+            background: linear-gradient(145deg, #e0dfdf, #f1f1f1);
+            padding: 20px;
+            border-radius: 8px;
+            width: 50%;
+            margin: 0 auto;
+            box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+}
+
+<section>
+
+    <!-- Header Handle Product-->
+    <div class="my-4">
+        <a href="/ProjectsAndSolds/PAS">
+            <button class="btn btn-outline-warning"><i class="bi bi-caret-left-square-fill"></i> Back to Product & Sold</button>
+        </a>
+        <h1 class="text-center">
+            @if (Model.Project.ProjectId == 0)
+            {
+                <text>Add Project</text>
+            }
+            else
+            {
+                <text>Update Project</text>
+            }
+        </h1>
+    </div>
+
+    <div class="form-container">
+        <form method="post" style="width:50%">
+            <input type="hidden" asp-for="Project.ProjectId" />
+            <input type="hidden" asp-for="Project.CreatedDate" />
+            <div class="mb-3">
+                <label asp-for="Project.ProjectName" class="form-label fw-bold">Project Name</label>
+                <input asp-for="Project.ProjectName" class="form-control" />
+                <span asp-validation-for="Project.ProjectName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Project.Description" class="form-label fw-bold">Description</label>
+                <textarea asp-for="Project.Description" class="form-control"></textarea>
+                <span asp-validation-for="Project.Description" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Project.AssetId" class="form-label fw-bold">Select Asset</label>
+                <select asp-for="Project.AssetId" class="form-control">
+                    <option value="">-- Select Asset --</option>
+                    @foreach (var asset in Model.AvailableAssets)
+                    {
+                        <option value="@asset.AssetId">@asset.AssetName</option>
+                    }
+                </select>
+            </div>
+            <div style="display:flex; justify-content:center">
+                <button type="submit" class="btn btn-outline-success">
+                    @if (Model.Project.ProjectId == 0)
+                    {
+                        <text><span class="fw-bold">Add Project</span></text>
+                    }
+                    else
+                    {
+                        <text><span class="fw-bold">Update Project</span> </text>
+                    }
+                </button>
+            </div>
+        </form>
+    </div>
+</section>

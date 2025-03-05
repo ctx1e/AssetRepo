@@ -1,0 +1,306 @@
+﻿@page "/Assets/HandleRename/{handler?}/{folderId:int?}/{fileId:int?}/{aid}/{type}"
+@model AssetRepo.Pages.Assets.HandleRenameModel
+@{
+    ViewData["Title"] = Model.typeName;
+}
+
+@section Styles {
+    <style>
+        .HandleAsset {
+            margin: 0 auto;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: center;
+            background: linear-gradient(145deg, #e0dfdf, #f1f1f1);
+            padding: 20px;
+            border-radius: 8px;
+            width: 50%;
+            margin: 0 auto;
+            box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .custom-textarea {
+            max-height: 100px;
+        }
+
+        h1 {
+            color: #212121
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: -100%;
+            width: 20%;
+            padding: 15px;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: right 0.5s ease;
+        }
+
+            .notification.show {
+                right: 20px;
+            }
+
+
+            .notification.success {
+                background-color: #28a745;
+            }
+
+
+            .notification.error {
+                background-color: #dc3545;
+            }
+    </style>
+}
+
+
+@if (TempData["Message"] != null)
+{
+    <div id="notification" class="notification @TempData["MessageType"]">
+        @TempData["Message"]
+    </div>
+}
+
+<section class="HandleAsset">
+
+    <!-- Header Handle Product-->
+    <div class="my-4">
+        @if (TempData["AssetId"] != null)
+{
+    var tempAssetId = (int)TempData["AssetId"]; 
+    var tempFolderId = TempData["FolderId"] != null ? (long)TempData["FolderId"] : (long?)null;
+    var folder = TempData["Folderr"] as Models.Folder; 
+            var file = TempData["Filee"] as Models.File;
+
+    if ((folder != null && folder.ParentFolderId == null && file == null) || (file != null && file.FolderId == null))
+    {
+        <a href="/Assets/AssetDetail/@tempAssetId">
+            <button class="btn btn-outline-warning"><i class="bi bi-caret-left-square-fill"></i> Back to Asset Detail</button>
+        </a>
+    } else if (folder != null && folder.ParentFolderId != null)
+    {
+        <a href="/Assets/AssetDetail/@tempAssetId/@folder.ParentFolderId">
+            <button class="btn btn-outline-warning"><i class="bi bi-caret-left-square-fill"></i> Back to Asset Detail</button>
+        </a>
+    } else
+    {
+        <a href="/Assets/AssetDetail/@tempAssetId/@tempFolderId">
+            <button class="btn btn-outline-warning"><i class="bi bi-caret-left-square-fill"></i> Back to Asset Detail</button>
+        </a>
+    }
+}
+else
+{
+    if ((Model.Folderr != null && Model.Folderr.ParentFolderId == null && Model.Filee == null) || (Model.Filee != null && Model.Filee.FolderId == null))
+    {
+        <a href="/Assets/AssetDetail/@Model.AssetId">
+            <button class="btn btn-outline-warning"><i class="bi bi-caret-left-square-fill"></i> Back to Asset Detail</button>
+        </a>
+    }
+    else if (Model.Folderr != null && Model.Folderr.ParentFolderId != null)
+    {
+        <a href="/Assets/AssetDetail/@Model.AssetId/@Model.Folderr.ParentFolderId">
+            <button class="btn btn-outline-warning"><i class="bi bi-caret-left-square-fill"></i> Back to Asset Detail</button>
+        </a>
+    }
+    else
+    {
+        <a href="/Assets/AssetDetail/@Model.AssetId/@Model.FolderId">
+            <button class="btn btn-outline-warning"><i class="bi bi-caret-left-square-fill"></i> Back to Asset Detail</button>
+        </a>
+    }
+}
+
+        <h1 class="text-center">
+            @Model.typeName
+        </h1>
+    </div>
+
+
+    <!-- Form Handle Product -->
+    <div class="form-container">
+        <form method="post" style="width:50%;">
+            <input asp-for="aid" type="hidden" />
+            <input asp-for="type" type="hidden" />
+            <input asp-for="folderId" type="hidden" />
+            <input asp-for="fileId" type="hidden" />
+            <input asp-for="typeName" type="hidden" />
+            <input asp-for="Folderr" type="hidden" />
+            <input asp-for="Filee" type="hidden" />
+            @if (Model.typeName.ToLower().Equals("rename folder"))
+            {
+                <div class="mb-3">
+                <label asp-for="Folderr.FolderName" class="form-label fw-bold">Folder Name</label>
+                <input asp-for="Folderr.FolderName" class="form-control" />
+                <span asp-validation-for="Folderr.FolderName" class="text-danger"></span>
+
+                </div>
+                    <div style="display:flex; justify-content:center">
+                        <button type="submit" class="btn btn-outline-success mx-2">
+                            Rename Folder
+                        </button>
+                    
+                        <div>
+                            <button type="button" class="btn btn-outline-danger mx-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteFolderModal"
+                            data-folder-name="@Model.Folderr.FolderName"
+                            data-folder-id="@Model.Folderr.FolderId"
+                            data-asset-id="@Model.Folderr.AssetId">
+                        Delete Folder                 
+                    </button>
+                   <div class="modal fade" id="deleteFolderModal" tabindex="-1" aria-labelledby="deleteFolderModalLabel" aria-hidden="true">
+                    <div class="modal-dialog text-center">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteFolderModalLabel">Confirm Delete</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Do you want to delete folder @Model.Folderr.FolderName?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-danger" id="confirmDeleteFolder">Yes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                        </div>
+                    
+                    </div>
+                <!-- Delete Folder Modal -->
+                
+            }
+            else
+            {
+                <div class="mb-3">
+                <label asp-for="Filee.FileName" class="form-label fw-bold">File Name</label>
+                <input asp-for="Filee.FileName" class="form-control" />
+                <span asp-validation-for="Filee.FileName" class="text-danger"></span>
+                </div>
+                <div style="display:flex; justify-content:center">
+                    <button type="submit" class="btn btn-outline-success">
+                        Rename
+                    </button>
+                    @if (TempData["Filee"] != null)
+                    {
+                        var tempFilee = TempData["Filee"] as Models.File;
+
+                        <a href="/Assets/DisplayFile/@tempFilee.FileId/Download">
+                            <button type="button" class="btn btn-outline-dark mx-2">
+                                Download
+
+                            </button>
+                        </a>
+                    } else
+                    {
+                        <a href="/Assets/DisplayFile/@Model.Filee.FileId/Download">
+                            <button type="button" class="btn btn-outline-dark mx-2">
+                                Download
+
+                            </button>
+                        </a>
+                    }
+                    
+                    <div>
+                    <button type="button" class="btn btn-outline-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteFileModal"
+                            data-file-name="@Model.Filee.FileName"
+                            data-file-id="@Model.Filee.FileId"
+                            data-asset-id="@Model.Filee.AssetId">
+                        Delete
+                        
+                    </button>
+                    <div class="modal fade" id="deleteFileModal" tabindex="-1" aria-labelledby="deleteFileModalLabel" aria-hidden="true">
+                    <div class="modal-dialog text-center">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteFileModalLabel">Confirm Delete</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Do you really want to delete file @Model.Filee.FileName?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                                <button type="button" class="btn btn-danger" id="confirmDeleteFile">Yes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                </div>
+                <!-- Delete File Modal -->
+                
+            }
+
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        window.onload = function () {
+            var notification = document.getElementById('notification');
+            if (notification) {
+                // Show notification
+                notification.classList.add('show');
+
+                // After 3 second, hidden notification
+                setTimeout(function () {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        };
+
+        let currentFolderId = null;
+        let currentFileId = null;
+        let currentAssetId = null;
+        // File
+        document.querySelectorAll('[data-bs-target="#deleteFileModal"]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var fileName = button.getAttribute('data-file-name');
+                currentFileId = button.getAttribute('data-file-id');
+                currentAssetId = button.getAttribute('data-asset-id');
+                document.getElementById('fileName').textContent = fileName;
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById("confirmDeleteFile").addEventListener("click", function () {
+        if (currentFileId) {
+            window.location.href = "/Assets/HandleRename/Delete/0/" + currentFileId + "/" + currentAssetId + "/File";
+        }
+    });
+});
+
+        // For folder deletion
+        document.querySelectorAll('[data-bs-target="#deleteFolderModal"]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var folderName = button.getAttribute('data-folder-name');
+                currentFolderId = button.getAttribute('data-folder-id');
+                currentAssetId = button.getAttribute('data-asset-id'); // Get the assetId for the folder
+                document.getElementById('folderName').textContent = folderName;
+            });
+        });
+
+        document.getElementById("confirmDeleteFolder").addEventListener("click", function () {
+            if (currentFolderId && currentAssetId) {
+                window.location.href = "/Assets/HandleRename/Delete/" + currentFolderId + "/0/" + currentAssetId + "/Folder";
+            }
+        });
+
+       
+    </script> 
+}
